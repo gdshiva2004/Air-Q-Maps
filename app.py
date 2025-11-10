@@ -86,7 +86,7 @@ if use_city_names:
     start_city = st.text_input("🏙️ Start Location", "Connaught Place, New Delhi")
     end_city = st.text_input("🏙️ Destination", "Cyber City, Gurgaon")
 
-    if st.button("🚗 Find Route and Analyze Air Quality"):
+    if st.button("🚗 Find Route and Analyze Air Quality", key="city_button"):
         start_coords = geocode_city(start_city)
         end_coords = geocode_city(end_city)
 
@@ -98,11 +98,6 @@ if use_city_names:
         st.session_state["start_coords"] = start_coords
         st.session_state["end_coords"] = end_coords
 
-# Use stored coords if available (prevents rerun issues)
-if "start_coords" in st.session_state and "end_coords" in st.session_state:
-    start_lat, start_lon = st.session_state["start_coords"]
-    end_lat, end_lon = st.session_state["end_coords"]
-
 else:
     st.subheader("Enter Coordinates Manually")
     col1, col2 = st.columns(2)
@@ -113,7 +108,7 @@ else:
         end_lat = st.number_input("End Latitude", value=28.4595)
         end_lon = st.number_input("End Longitude", value=77.0266)
 
-    if st.button("🚗 Find Route and Analyze Air Quality"):
+    if st.button("🚗 Find Route and Analyze Air Quality", key="coord_button"):
         st.session_state["start_coords"] = (start_lat, start_lon)
         st.session_state["end_coords"] = (end_lat, end_lon)
 
