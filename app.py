@@ -87,7 +87,6 @@ if use_city_names:
     end_city = st.text_input("🏙️ Destination", "Cyber City, Gurgaon")
 
     if st.button("🚗 Find Route and Analyze Air Quality"):
-        st.info("Fetching coordinates via OpenCage Geocoding...")
         start_coords = geocode_city(start_city)
         end_coords = geocode_city(end_city)
 
@@ -95,8 +94,14 @@ if use_city_names:
             st.error("❌ Could not geocode one or both locations. Try again.")
             st.stop()
 
-        start_lat, start_lon = start_coords
-        end_lat, end_lon = end_coords
+        # store in session so map persists
+        st.session_state["start_coords"] = start_coords
+        st.session_state["end_coords"] = end_coords
+
+# Use stored coords if available (prevents rerun issues)
+if "start_coords" in st.session_state and "end_coords" in st.session_state:
+    start_lat, start_lon = st.session_state["start_coords"]
+    end_lat, end_lon = st.session_state["end_coords"]
 
 else:
     st.subheader("Enter Coordinates Manually")
@@ -109,16 +114,17 @@ else:
         end_lon = st.number_input("End Longitude", value=77.0266)
 
     if st.button("🚗 Find Route and Analyze Air Quality"):
-        pass
+        st.session_state["start_coords"] = (start_lat, start_lon)
+        st.session_state["end_coords"] = (end_lat, end_lon)
 
 # -----------------------------------
 # Route Analysis Section
 # -----------------------------------
-if 'start_lat' in locals() and 'end_lat' in locals():
+if "start_coords" in st.session_state and "end_coords" in st.session_state:
     try:
         st.info("Fetching routes and analyzing air quality... Please wait ⏳")
 
-        routes = cached_route((start_lat, start_lon), (end_lat, end_lon))
+        routes = cached_route(st.session_state["start_coords"], st.session_state["end_coords"])
         if not routes:
             st.error("⚠️ No routes returned from GraphHopper.")
             st.stop()
@@ -147,7 +153,7 @@ if 'start_lat' in locals() and 'end_lat' in locals():
 
         st.subheader("🗺️ Route Visualization")
         map_obj = visualize_route(best[3], best[2])
-        st_folium(map_obj, width=900, height=500)
+        st_folium(map_obj, width=900, height=500, key="route_map")
 
         if len(route_scores) > 1:
             st.markdown("### 🧾 Comparison of All Routes")
