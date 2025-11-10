@@ -17,7 +17,7 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     a = math.sin(dphi/2)**2 + math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
-def get_pm25_nearby(lat, lon, radius_m=15000, limit=5):
+def get_pm25_nearby(lat, lon, radius_m=50000, limit=5):
     """
     Returns weighted average PM2.5 (µg/m³) near the coordinate.
     """
